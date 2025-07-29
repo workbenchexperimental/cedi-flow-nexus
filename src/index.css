@@ -2,57 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* PIPR Design System - Manufacturing Excellence UI
+   Industrial-grade colors, gradients, and animations for production management
+   All colors MUST be HSL for consistency
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core PIPR Brand Colors - Industrial Blue & Steel */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 210 25% 99%;
+    --card-foreground: 215 25% 8%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 210 25% 99%;
+    --popover-foreground: 215 25% 8%;
 
-    --primary: 222.2 47.4% 11.2%;
+    /* Primary: Industrial Blue - Manufacturing Excellence */
+    --primary: 215 85% 35%;
     --primary-foreground: 210 40% 98%;
+    --primary-glow: 215 75% 60%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Steel Gray - Professional Operations */
+    --secondary: 215 15% 92%;
+    --secondary-foreground: 215 25% 15%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted: Subtle Background */
+    --muted: 215 20% 95%;
+    --muted-foreground: 215 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent: Production Orange - Action & Alerts */
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
+    /* Status Colors */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 43 96% 56%;
+    --warning-foreground: 25 5% 8%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Critical Status Indicators */
+    --critical: 0 85% 55%;
+    --critical-foreground: 0 0% 100%;
+    --healthy: 142 71% 45%;
+    --healthy-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    /* Interface Elements */
+    --border: 215 15% 88%;
+    --input: 215 15% 88%;
+    --ring: 215 85% 35%;
 
-    --sidebar-background: 0 0% 98%;
+    --radius: 0.75rem;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Production Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-manufacturing: linear-gradient(135deg, hsl(215 85% 25%), hsl(215 85% 45%));
+    --gradient-status-healthy: linear-gradient(135deg, hsl(var(--healthy)), hsl(142 71% 55%));
+    --gradient-status-warning: linear-gradient(135deg, hsl(var(--warning)), hsl(43 96% 66%));
+    --gradient-status-critical: linear-gradient(135deg, hsl(var(--critical)), hsl(0 85% 65%));
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Industrial Shadows */
+    --shadow-industrial: 0 4px 20px -4px hsl(var(--primary) / 0.15);
+    --shadow-card: 0 2px 10px -2px hsl(215 25% 8% / 0.08);
+    --shadow-glow: 0 0 30px hsl(var(--primary-glow) / 0.3);
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    /* Animations */
+    --transition-industrial: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --animation-pulse-glow: pulse-glow 2s ease-in-out infinite alternate;
 
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar Colors - Updated for PIPR */
+    --sidebar-background: 215 20% 97%;
+    --sidebar-foreground: 215 25% 20%;
+    --sidebar-primary: 215 85% 35%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 215 15% 92%;
+    --sidebar-accent-foreground: 215 25% 15%;
+    --sidebar-border: 215 15% 88%;
+    --sidebar-ring: 215 85% 35%;
   }
 
   .dark {
@@ -100,6 +129,73 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-medium;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+
+  /* Industrial Animations */
+  @keyframes pulse-glow {
+    0% { box-shadow: 0 0 20px hsl(var(--primary-glow) / 0.4); }
+    100% { box-shadow: 0 0 30px hsl(var(--primary-glow) / 0.6); }
+  }
+
+  @keyframes manufacturing-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+  }
+
+  /* Status Indicator Classes */
+  .status-healthy { 
+    background: var(--gradient-status-healthy);
+    color: hsl(var(--healthy-foreground));
+  }
+  
+  .status-warning { 
+    background: var(--gradient-status-warning);
+    color: hsl(var(--warning-foreground));
+  }
+  
+  .status-critical { 
+    background: var(--gradient-status-critical);
+    color: hsl(var(--critical-foreground));
+  }
+
+  /* Industrial Component Styles */
+  .card-industrial {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-industrial);
+  }
+
+  .card-industrial:hover {
+    box-shadow: var(--shadow-industrial);
+    transform: translateY(-2px);
+  }
+
+  .btn-manufacturing {
+    background: var(--gradient-primary);
+    color: hsl(var(--primary-foreground));
+    border: none;
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-industrial);
+  }
+
+  .btn-manufacturing:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+
+  /* Production Dashboard Styles */
+  .metric-card {
+    @apply rounded-xl p-6 transition-all duration-300 hover:shadow-lg;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+  }
+
+  .production-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
   }
 }
