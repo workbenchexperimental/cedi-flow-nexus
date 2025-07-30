@@ -246,19 +246,19 @@ export const Dashboard: React.FC = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Role-based Dashboard Content */}
-        {userRole === 'superadministrador' && (
+        {dashboardData && userRole === 'superadministrador' && (
           <SuperAdminDashboard data={dashboardData} />
         )}
         
-        {userRole === 'administrador' && (
+        {dashboardData && userRole === 'administrador' && (
           <AdminDashboard data={dashboardData} />
         )}
         
-        {userRole === 'supervisor' && (
+        {dashboardData && userRole === 'supervisor' && (
           <SupervisorDashboard data={dashboardData} />
         )}
         
-        {userRole === 'operario' && (
+        {dashboardData && userRole === 'operario' && (
           <OperatorDashboard data={dashboardData} />
         )}
       </main>
