@@ -28,23 +28,42 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('AuthGuard: Initializing...');
+    
     // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('AuthGuard: Session check result:', { session: !!session, error });
+      
+      if (error) {
+        console.error('AuthGuard: Session error:', error);
+        setLoading(false);
+        return;
+      }
+      
       if (session?.user) {
+        console.log('AuthGuard: Found session, fetching profile...');
         fetchUserProfile(session.user.id);
       } else {
+        console.log('AuthGuard: No session found, showing login');
         setLoading(false);
       }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('AuthGuard: Auth state change:', event, !!session);
+        
         if (event === 'SIGNED_IN' && session?.user) {
-          await fetchUserProfile(session.user.id);
+          fetchUserProfile(session.user.id);
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setLoading(false);
+        } else if (event === 'TOKEN_REFRESHED') {
+          // Handle token refresh without refetching profile if user exists
+          if (!user && session?.user) {
+            fetchUserProfile(session.user.id);
+          }
         }
       }
     );
@@ -54,31 +73,43 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log('AuthGuard: Fetching profile for user:', userId);
+      
       const { data, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
 
+      console.log('AuthGuard: Profile query result:', { data, error });
+
       if (error) throw error;
 
       const { data: sessionData } = await supabase.auth.getSession();
       
-      setUser({
+      const userData = {
         id: userId,
         email: sessionData.session?.user.email || '',
         full_name: data?.full_name || null,
-        role: data?.role || 'operador',
+        role: data?.role || 'operario',
         cedi_id: data?.cedi_id || null
-      });
+      };
+      
+      console.log('AuthGuard: Setting user data:', userData);
+      setUser(userData);
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error('AuthGuard: Error fetching user profile:', error);
       toast({
         title: "Error",
         description: "No se pudo cargar el perfil de usuario",
         variant: "destructive"
       });
+      
+      // If there's an error fetching profile but user is authenticated,
+      // sign them out to prevent infinite loading
+      supabase.auth.signOut();
     } finally {
+      console.log('AuthGuard: Setting loading to false');
       setLoading(false);
     }
   };
