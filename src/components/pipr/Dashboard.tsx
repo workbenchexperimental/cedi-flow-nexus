@@ -125,11 +125,15 @@ export const Dashboard: React.FC = () => {
 
   const fetchDashboardData = async () => {
     try {
+      console.log('Dashboard: Fetching dashboard data...');
       const { data, error } = await supabase.rpc('get_dashboard_metrics_by_role');
+      
+      console.log('Dashboard: RPC result:', { data, error });
       
       if (error) throw error;
       
       if (data) {
+        console.log('Dashboard: Setting dashboard data:', data);
         setDashboardData(data as unknown as DashboardData);
       }
     } catch (error: any) {
@@ -140,6 +144,7 @@ export const Dashboard: React.FC = () => {
         variant: "destructive"
       });
     } finally {
+      console.log('Dashboard: Setting loading to false');
       setLoading(false);
     }
   };
