@@ -58,7 +58,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         .from('users')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -67,9 +67,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
       setUser({
         id: userId,
         email: sessionData.session?.user.email || '',
-        full_name: data.full_name,
-        role: data.role,
-        cedi_id: data.cedi_id
+        full_name: data?.full_name || null,
+        role: data?.role || 'operador',
+        cedi_id: data?.cedi_id || null
       });
     } catch (error) {
       console.error('Error fetching user profile:', error);
