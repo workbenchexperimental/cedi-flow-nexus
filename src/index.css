@@ -198,4 +198,63 @@
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
   }
+
+  /* Superadmin Dashboard Specific Styles */
+  .admin-action-card {
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-xl;
+    background: var(--gradient-primary);
+    color: hsl(var(--primary-foreground));
+  }
+
+  .admin-action-card:hover {
+    background: var(--gradient-manufacturing);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .cedi-health-card {
+    @apply transition-all duration-300;
+    background: hsl(var(--card));
+    border: 2px solid hsl(var(--border));
+  }
+
+  .cedi-health-card.healthy {
+    border-color: hsl(var(--healthy));
+    box-shadow: 0 0 20px hsl(var(--healthy) / 0.1);
+  }
+
+  .cedi-health-card.warning {
+    border-color: hsl(var(--warning));
+    box-shadow: 0 0 20px hsl(var(--warning) / 0.1);
+  }
+
+  .cedi-health-card.critical {
+    border-color: hsl(var(--critical));
+    box-shadow: 0 0 20px hsl(var(--critical) / 0.1);
+    animation: manufacturing-pulse 2s infinite;
+  }
+
+  /* Status Badge Gradients */
+  .bg-gradient-healthy {
+    background: var(--gradient-status-healthy);
+  }
+
+  .bg-gradient-warning {
+    background: var(--gradient-status-warning);
+  }
+
+  .bg-gradient-critical {
+    background: var(--gradient-status-critical);
+  }
+
+  .text-healthy-foreground {
+    color: hsl(var(--healthy-foreground));
+  }
+
+  .text-warning-foreground {
+    color: hsl(var(--warning-foreground));
+  }
+
+  .text-critical-foreground {
+    color: hsl(var(--critical-foreground));
+  }
 }

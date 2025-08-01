@@ -274,6 +274,7 @@ export const Dashboard: React.FC = () => {
 // Super Administrator Dashboard
 const SuperAdminDashboard: React.FC<{ data: DashboardData }> = ({ data }) => (
   <div className="space-y-6">
+    {/* Métricas Principales */}
     <div className="production-grid">
       <Card className="metric-card">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -303,15 +304,159 @@ const SuperAdminDashboard: React.FC<{ data: DashboardData }> = ({ data }) => (
 
       <Card className="metric-card">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Producción Hoy</CardTitle>
+          <CardTitle className="text-sm font-medium">Producción Nacional Hoy</CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.summary?.total_operators || 0}</div>
-          <p className="text-xs text-muted-foreground">registros de producción</p>
+          <div className="text-2xl font-bold">{(data as any)?.production_national?.total_production_today || 0}</div>
+          <p className="text-xs text-muted-foreground">
+            {(data as any)?.production_national?.approved_today || 0} aprobados
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card className="metric-card">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">CEDIs Activos Hoy</CardTitle>
+          <BarChart3 className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{(data as any)?.production_national?.active_cedis_today || 0}</div>
+          <p className="text-xs text-muted-foreground">
+            {(data as any)?.production_national?.pending_national || 0} registros pendientes
+          </p>
         </CardContent>
       </Card>
     </div>
+
+    {/* Estado del Sistema */}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="h-5 w-5" />
+          Estado del Sistema Nacional
+        </CardTitle>
+        <CardDescription>Monitoreo y salud de la plataforma PIPR</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Estado General</span>
+              {getHealthStatusBadge((data as any)?.system_status?.overall_health || 'HEALTHY')}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Sistema de monitoreo en tiempo real
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Último Respaldo</span>
+              <Badge variant="outline">
+                {(data as any)?.system_status?.backup_status || 'N/A'}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Tamaño: {(data as any)?.system_status?.backup_size_mb || 0} MB
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Última Actualización</span>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {new Date().toLocaleString('es-ES')}
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    {/* Salud por CEDI */}
+    {(data as any)?.health_by_cedi && (data as any).health_by_cedi.length > 0 && (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Factory className="h-5 w-5" />
+            Estado de Salud por CEDI
+          </CardTitle>
+          <CardDescription>Monitoreo operativo de cada centro de distribución</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(data as any).health_by_cedi.map((cedi: any, index: number) => (
+              <Card key={index} className="border-2">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center justify-between">
+                    {cedi.cedi_name || `CEDI ${index + 1}`}
+                    {getHealthStatusBadge(cedi.health_status)}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Operarios:</span>
+                    <span className="font-medium">{cedi.total_operators || 0}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Producción hoy:</span>
+                    <span className="font-medium">{cedi.today_production || 0}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Pendientes:</span>
+                    <span className="font-medium">{cedi.pending_approvals || 0}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Inventario:</span>
+                    <span className="font-medium">{cedi.total_articles || 0} artículos</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )}
+
+    {/* Acciones Rápidas */}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="h-5 w-5" />
+          Administración Global
+        </CardTitle>
+        <CardDescription>Acciones administrativas del superadministrador</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+            <Factory className="h-6 w-6" />
+            <span className="text-sm font-medium">Gestionar CEDIs</span>
+            <span className="text-xs text-muted-foreground">Crear y configurar</span>
+          </Button>
+          
+          <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+            <Users className="h-6 w-6" />
+            <span className="text-sm font-medium">Administradores</span>
+            <span className="text-xs text-muted-foreground">Crear cuentas</span>
+          </Button>
+          
+          <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+            <Package className="h-6 w-6" />
+            <span className="text-sm font-medium">Catálogo Maestro</span>
+            <span className="text-xs text-muted-foreground">Gestionar productos</span>
+          </Button>
+          
+          <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+            <BarChart3 className="h-6 w-6" />
+            <span className="text-sm font-medium">Reportes Globales</span>
+            <span className="text-xs text-muted-foreground">Analítica avanzada</span>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   </div>
 );
 
