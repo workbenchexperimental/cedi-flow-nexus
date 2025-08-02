@@ -66,13 +66,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "articles_cedi_id_fkey"
-            columns: ["cedi_id"]
-            isOneToOne: false
-            referencedRelation: "mv_system_health"
-            referencedColumns: ["cedi_id"]
-          },
-          {
             foreignKeyName: "articles_master_article_id_fkey"
             columns: ["master_article_id"]
             isOneToOne: false
@@ -242,13 +235,6 @@ export type Database = {
             referencedRelation: "cedis"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "groups_cedi_id_fkey"
-            columns: ["cedi_id"]
-            isOneToOne: false
-            referencedRelation: "mv_system_health"
-            referencedColumns: ["cedi_id"]
-          },
         ]
       }
       inventory_movements: {
@@ -302,13 +288,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cedis"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "inventory_movements_cedi_id_fkey"
-            columns: ["cedi_id"]
-            isOneToOne: false
-            referencedRelation: "mv_system_health"
-            referencedColumns: ["cedi_id"]
           },
           {
             foreignKeyName: "inventory_movements_created_by_fkey"
@@ -397,6 +376,36 @@ export type Database = {
           description?: string | null
           id?: number
           name?: string
+        }
+        Relationships: []
+      }
+      mv_system_health: {
+        Row: {
+          cedi_id: number
+          cedi_name: string | null
+          health_status: string | null
+          pending_approvals: number | null
+          today_production: number | null
+          total_articles: number | null
+          total_operators: number | null
+        }
+        Insert: {
+          cedi_id: number
+          cedi_name?: string | null
+          health_status?: string | null
+          pending_approvals?: number | null
+          today_production?: number | null
+          total_articles?: number | null
+          total_operators?: number | null
+        }
+        Update: {
+          cedi_id?: number
+          cedi_name?: string | null
+          health_status?: string | null
+          pending_approvals?: number | null
+          today_production?: number | null
+          total_articles?: number | null
+          total_operators?: number | null
         }
         Relationships: []
       }
@@ -535,13 +544,6 @@ export type Database = {
             referencedRelation: "cedis"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "orders_cedi_id_fkey"
-            columns: ["cedi_id"]
-            isOneToOne: false
-            referencedRelation: "mv_system_health"
-            referencedColumns: ["cedi_id"]
-          },
         ]
       }
       package_components: {
@@ -617,13 +619,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "packages_cedi_id_fkey"
-            columns: ["cedi_id"]
-            isOneToOne: false
-            referencedRelation: "mv_system_health"
-            referencedColumns: ["cedi_id"]
-          },
-          {
             foreignKeyName: "packages_master_package_id_fkey"
             columns: ["master_package_id"]
             isOneToOne: false
@@ -682,13 +677,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cedis"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "production_logs_cedi_id_fkey"
-            columns: ["cedi_id"]
-            isOneToOne: false
-            referencedRelation: "mv_system_health"
-            referencedColumns: ["cedi_id"]
           },
           {
             foreignKeyName: "production_logs_group_id_fkey"
@@ -804,13 +792,6 @@ export type Database = {
             referencedRelation: "cedis"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "system_metrics_cedi_id_fkey"
-            columns: ["cedi_id"]
-            isOneToOne: false
-            referencedRelation: "mv_system_health"
-            referencedColumns: ["cedi_id"]
-          },
         ]
       }
       users: {
@@ -840,30 +821,11 @@ export type Database = {
             referencedRelation: "cedis"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "users_cedi_id_fkey"
-            columns: ["cedi_id"]
-            isOneToOne: false
-            referencedRelation: "mv_system_health"
-            referencedColumns: ["cedi_id"]
-          },
         ]
       }
     }
     Views: {
-      mv_system_health: {
-        Row: {
-          avg_pending_hours: number | null
-          calculated_at: string | null
-          cedi_id: number | null
-          cedi_name: string | null
-          health_status: string | null
-          low_stock_alerts: number | null
-          out_of_stock_alerts: number | null
-          pending_approvals: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       get_cedi_admin_dashboard_metrics: {
