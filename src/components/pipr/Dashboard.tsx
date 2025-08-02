@@ -433,26 +433,26 @@ const SuperAdminDashboard: React.FC<{ data: DashboardData }> = ({ data }) => (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
             <Factory className="h-6 w-6" />
-            <span className="text-sm font-medium">Gestionar CEDIs</span>
-            <span className="text-xs text-muted-foreground">Crear y configurar</span>
+            <span className="text-sm font-medium">RF-101: Gestionar CEDIs</span>
+            <span className="text-xs text-muted-foreground">Crear y configurar centros</span>
           </Button>
           
           <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
             <Users className="h-6 w-6" />
-            <span className="text-sm font-medium">Administradores</span>
-            <span className="text-xs text-muted-foreground">Crear cuentas</span>
+            <span className="text-sm font-medium">RF-102: Administradores</span>
+            <span className="text-xs text-muted-foreground">Gestionar usuarios</span>
           </Button>
           
           <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
             <Package className="h-6 w-6" />
-            <span className="text-sm font-medium">Catálogo Maestro</span>
-            <span className="text-xs text-muted-foreground">Gestionar productos</span>
+            <span className="text-sm font-medium">RF-104: Catálogo Maestro</span>
+            <span className="text-xs text-muted-foreground">Artículos y paquetes</span>
           </Button>
           
           <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
             <BarChart3 className="h-6 w-6" />
-            <span className="text-sm font-medium">Reportes Globales</span>
-            <span className="text-xs text-muted-foreground">Analítica avanzada</span>
+            <span className="text-sm font-medium">RF-106: Auditoría Global</span>
+            <span className="text-xs text-muted-foreground">Logs de sistema</span>
           </Button>
         </div>
       </CardContent>
