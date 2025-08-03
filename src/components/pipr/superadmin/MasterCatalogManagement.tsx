@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Package, Plus, Edit, Trash2, Archive, Component } from 'lucide-react';
+import { Package, Plus, Edit, Trash2, BarChart3 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,12 +18,12 @@ const articleSchema = z.object({
   sku: z.string().min(3, 'El SKU debe tener al menos 3 caracteres'),
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   description: z.string().optional(),
-}) satisfies z.ZodType<{sku: string; name: string; description?: string}>;
+});
 
 const packageSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   description: z.string().optional(),
-}) satisfies z.ZodType<{name: string; description?: string}>;
+});
 
 type ArticleFormData = z.infer<typeof articleSchema>;
 type PackageFormData = z.infer<typeof packageSchema>;
@@ -32,26 +32,13 @@ interface MasterArticle {
   id: number;
   sku: string;
   name: string;
-  description: string;
-  created_at: string;
+  description?: string;
 }
 
 interface MasterPackage {
   id: number;
   name: string;
-  description: string;
-  created_at: string;
-  components?: MasterPackageComponent[];
-}
-
-interface MasterPackageComponent {
-  id: number;
-  master_article_id: number;
-  quantity_required: number;
-  master_article?: {
-    sku: string;
-    name: string;
-  };
+  description?: string;
 }
 
 export const MasterCatalogManagement: React.FC = () => {
@@ -62,7 +49,6 @@ export const MasterCatalogManagement: React.FC = () => {
   const [selectedPackage, setSelectedPackage] = useState<MasterPackage | null>(null);
   const [isArticleDialogOpen, setIsArticleDialogOpen] = useState(false);
   const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('articles');
   const { toast } = useToast();
 
   const articleForm = useForm<ArticleFormData>({
@@ -104,18 +90,7 @@ export const MasterCatalogManagement: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('master_packages')
-        .select(`
-          *,
-          master_package_components (
-            id,
-            master_article_id,
-            quantity_required,
-            master_articles (
-              sku,
-              name
-            )
-          )
-        `)
+        .select('*')
         .order('name');
 
       if (error) throw error;
@@ -129,14 +104,12 @@ export const MasterCatalogManagement: React.FC = () => {
     }
   };
 
-  const fetchData = async () => {
-    setLoading(true);
-    await Promise.all([fetchArticles(), fetchPackages()]);
-    setLoading(false);
-  };
-
   useEffect(() => {
-    fetchData();
+    const loadData = async () => {
+      await Promise.all([fetchArticles(), fetchPackages()]);
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   const onArticleSubmit = async (data: ArticleFormData) => {
@@ -145,7 +118,11 @@ export const MasterCatalogManagement: React.FC = () => {
         // Actualizar artículo existente
         const { error } = await supabase
           .from('master_articles')
-          .update(data)
+          .update({
+            sku: data.sku,
+            name: data.name,
+            description: data.description || null,
+          })
           .eq('id', selectedArticle.id);
 
         if (error) throw error;
@@ -158,7 +135,11 @@ export const MasterCatalogManagement: React.FC = () => {
         // Crear nuevo artículo
         const { error } = await supabase
           .from('master_articles')
-          .insert(data);
+          .insert([{
+            sku: data.sku,
+            name: data.name,
+            description: data.description || null,
+          }]);
 
         if (error) throw error;
 
@@ -172,10 +153,10 @@ export const MasterCatalogManagement: React.FC = () => {
       setSelectedArticle(null);
       articleForm.reset();
       fetchArticles();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'No se pudo procesar la solicitud',
+        description: selectedArticle ? 'No se pudo actualizar el artículo' : 'No se pudo crear el artículo',
         variant: 'destructive',
       });
     }
@@ -187,7 +168,10 @@ export const MasterCatalogManagement: React.FC = () => {
         // Actualizar paquete existente
         const { error } = await supabase
           .from('master_packages')
-          .update(data)
+          .update({
+            name: data.name,
+            description: data.description || null,
+          })
           .eq('id', selectedPackage.id);
 
         if (error) throw error;
@@ -200,7 +184,10 @@ export const MasterCatalogManagement: React.FC = () => {
         // Crear nuevo paquete
         const { error } = await supabase
           .from('master_packages')
-          .insert(data);
+          .insert([{
+            name: data.name,
+            description: data.description || null,
+          }]);
 
         if (error) throw error;
 
@@ -214,10 +201,10 @@ export const MasterCatalogManagement: React.FC = () => {
       setSelectedPackage(null);
       packageForm.reset();
       fetchPackages();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'No se pudo procesar la solicitud',
+        description: selectedPackage ? 'No se pudo actualizar el paquete' : 'No se pudo crear el paquete',
         variant: 'destructive',
       });
     }
@@ -245,7 +232,7 @@ export const MasterCatalogManagement: React.FC = () => {
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'No se pudo eliminar el artículo. Verifique que no esté siendo usado en paquetes.',
+        description: 'No se pudo eliminar el artículo. Verifique que no tenga datos asociados.',
         variant: 'destructive',
       });
     }
@@ -273,7 +260,7 @@ export const MasterCatalogManagement: React.FC = () => {
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'No se pudo eliminar el paquete.',
+        description: 'No se pudo eliminar el paquete. Verifique que no tenga datos asociados.',
         variant: 'destructive',
       });
     }
@@ -329,24 +316,33 @@ export const MasterCatalogManagement: React.FC = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Package className="h-5 w-5" />
-          Gestión de Catálogo Maestro
-        </CardTitle>
-        <CardDescription>
-          Crear y modificar el catálogo maestro de artículos y paquetes disponibles para todos los CEDIs
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Package className="h-5 w-5" />
+              Gestión de Catálogo Maestro
+            </CardTitle>
+            <CardDescription>
+              Administrar artículos y paquetes maestros para todos los CEDIs
+            </CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs defaultValue="articles" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="articles">Artículos Maestros</TabsTrigger>
-            <TabsTrigger value="packages">Paquetes Maestros</TabsTrigger>
+            <TabsTrigger value="articles" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Artículos Maestros ({articles.length})
+            </TabsTrigger>
+            <TabsTrigger value="packages" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Paquetes Maestros ({packages.length})
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="articles" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium">Artículos (Componentes)</h3>
+            <div className="flex justify-end">
               <Dialog open={isArticleDialogOpen} onOpenChange={setIsArticleDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => openArticleDialog()} className="flex items-center gap-2">
@@ -360,7 +356,7 @@ export const MasterCatalogManagement: React.FC = () => {
                       {selectedArticle ? 'Editar Artículo' : 'Crear Nuevo Artículo'}
                     </DialogTitle>
                     <DialogDescription>
-                      {selectedArticle 
+                      {selectedArticle
                         ? 'Modifique los datos del artículo maestro'
                         : 'Complete los datos del nuevo artículo maestro'
                       }
@@ -388,7 +384,7 @@ export const MasterCatalogManagement: React.FC = () => {
                           <FormItem>
                             <FormLabel>Nombre</FormLabel>
                             <FormControl>
-                              <Input placeholder="Tornillo M6" {...field} />
+                              <Input placeholder="Nombre del artículo" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -399,12 +395,9 @@ export const MasterCatalogManagement: React.FC = () => {
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Descripción</FormLabel>
+                            <FormLabel>Descripción (Opcional)</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                placeholder="Descripción detallada del artículo..."
-                                {...field} 
-                              />
+                              <Textarea placeholder="Descripción del artículo" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -439,14 +432,10 @@ export const MasterCatalogManagement: React.FC = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {article.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
+                      <p className="text-sm text-muted-foreground">
                         {article.description}
                       </p>
                     )}
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Archive className="h-3 w-3" />
-                      Creado: {new Date(article.created_at).toLocaleDateString('es-ES')}
-                    </div>
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
@@ -479,8 +468,7 @@ export const MasterCatalogManagement: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="packages" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium">Paquetes (Productos Terminados)</h3>
+            <div className="flex justify-end">
               <Dialog open={isPackageDialogOpen} onOpenChange={setIsPackageDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => openPackageDialog()} className="flex items-center gap-2">
@@ -494,7 +482,7 @@ export const MasterCatalogManagement: React.FC = () => {
                       {selectedPackage ? 'Editar Paquete' : 'Crear Nuevo Paquete'}
                     </DialogTitle>
                     <DialogDescription>
-                      {selectedPackage 
+                      {selectedPackage
                         ? 'Modifique los datos del paquete maestro'
                         : 'Complete los datos del nuevo paquete maestro'
                       }
@@ -509,7 +497,7 @@ export const MasterCatalogManagement: React.FC = () => {
                           <FormItem>
                             <FormLabel>Nombre</FormLabel>
                             <FormControl>
-                              <Input placeholder="Kit Básico" {...field} />
+                              <Input placeholder="Nombre del paquete" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -520,12 +508,9 @@ export const MasterCatalogManagement: React.FC = () => {
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Descripción</FormLabel>
+                            <FormLabel>Descripción (Opcional)</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                placeholder="Descripción detallada del paquete..."
-                                {...field} 
-                              />
+                              <Textarea placeholder="Descripción del paquete" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -553,34 +538,17 @@ export const MasterCatalogManagement: React.FC = () => {
               {packages.map((pkg) => (
                 <Card key={pkg.id} className="border-2">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base">{pkg.name}</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">{pkg.name}</CardTitle>
+                      <Badge variant="secondary">Paquete</Badge>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {pkg.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
+                      <p className="text-sm text-muted-foreground">
                         {pkg.description}
                       </p>
                     )}
-                    {pkg.components && pkg.components.length > 0 && (
-                      <div className="space-y-1">
-                        <span className="text-xs font-medium">Componentes:</span>
-                        {pkg.components.slice(0, 3).map((component) => (
-                          <div key={component.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Component className="h-3 w-3" />
-                            {component.quantity_required}x {component.master_article?.name}
-                          </div>
-                        ))}
-                        {pkg.components.length > 3 && (
-                          <span className="text-xs text-muted-foreground">
-                            +{pkg.components.length - 3} más...
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Archive className="h-3 w-3" />
-                      Creado: {new Date(pkg.created_at).toLocaleDateString('es-ES')}
-                    </div>
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"

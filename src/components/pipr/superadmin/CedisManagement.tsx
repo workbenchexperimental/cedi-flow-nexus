@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -17,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 const cedisSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   location: z.string().min(3, 'La ubicación debe tener al menos 3 caracteres'),
-  is_active: z.boolean().default(true),
+  is_active: z.boolean(),
 });
 
 type CedisFormData = z.infer<typeof cedisSchema>;
@@ -75,7 +74,11 @@ export const CedisManagement: React.FC = () => {
         // Actualizar CEDI existente
         const { error } = await supabase
           .from('cedis')
-          .update(data)
+          .update({
+            name: data.name,
+            location: data.location,
+            is_active: data.is_active,
+          })
           .eq('id', selectedCedi.id);
 
         if (error) throw error;
@@ -88,7 +91,11 @@ export const CedisManagement: React.FC = () => {
         // Crear nuevo CEDI
         const { error } = await supabase
           .from('cedis')
-          .insert(data);
+          .insert([{
+            name: data.name,
+            location: data.location,
+            is_active: data.is_active,
+          }]);
 
         if (error) throw error;
 
