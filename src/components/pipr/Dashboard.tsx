@@ -14,9 +14,15 @@ import {
   LogOut,
   Settings,
   BarChart3,
-  Shield
+  Shield,
+  FolderOpen,
+  Upload
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LocalStaffManagement } from './admin/LocalStaffManagement';
+import { LocalCatalogManagement } from './admin/LocalCatalogManagement';
+import { BulkStockUpdate } from './admin/BulkStockUpdate';
 
 interface DashboardData {
   timestamp: string;
@@ -463,6 +469,7 @@ const SuperAdminDashboard: React.FC<{ data: DashboardData }> = ({ data }) => (
 // CEDI Administrator Dashboard
 const AdminDashboard: React.FC<{ data: DashboardData }> = ({ data }) => (
   <div className="space-y-6">
+    {/* RF-203: CEDI Dashboard KPIs */}
     <div className="production-grid">
       <Card className="metric-card">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -479,7 +486,7 @@ const AdminDashboard: React.FC<{ data: DashboardData }> = ({ data }) => (
 
       <Card className="metric-card">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Inventario</CardTitle>
+          <CardTitle className="text-sm font-medium">Estado del Inventario</CardTitle>
           <Package className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -519,6 +526,67 @@ const AdminDashboard: React.FC<{ data: DashboardData }> = ({ data }) => (
         </CardContent>
       </Card>
     </div>
+
+    {/* CEDI Administrator Management Tabs */}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="h-5 w-5" />
+          Administración CEDI
+        </CardTitle>
+        <CardDescription>Gestión local del centro de distribución</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Resumen</TabsTrigger>
+            <TabsTrigger value="staff">RF-201: Personal</TabsTrigger>
+            <TabsTrigger value="catalog">RF-202: Catálogo</TabsTrigger>
+            <TabsTrigger value="stock">RF-204: Stock CSV</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+                <Users className="h-6 w-6" />
+                <span className="text-sm font-medium">RF-201: Personal Local</span>
+                <span className="text-xs text-muted-foreground">Gestionar supervisores y operarios</span>
+              </Button>
+              
+              <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+                <FolderOpen className="h-6 w-6" />
+                <span className="text-sm font-medium">RF-202: Catálogo Local</span>
+                <span className="text-xs text-muted-foreground">Habilitar artículos y paquetes</span>
+              </Button>
+              
+              <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+                <BarChart3 className="h-6 w-6" />
+                <span className="text-sm font-medium">RF-203: Dashboard CEDI</span>
+                <span className="text-xs text-muted-foreground">KPIs y métricas locales</span>
+              </Button>
+              
+              <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+                <Upload className="h-6 w-6" />
+                <span className="text-sm font-medium">RF-204: Stock CSV</span>
+                <span className="text-xs text-muted-foreground">Actualización masiva</span>
+              </Button>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="staff">
+            <LocalStaffManagement />
+          </TabsContent>
+          
+          <TabsContent value="catalog">
+            <LocalCatalogManagement />
+          </TabsContent>
+          
+          <TabsContent value="stock">
+            <BulkStockUpdate />
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   </div>
 );
 
