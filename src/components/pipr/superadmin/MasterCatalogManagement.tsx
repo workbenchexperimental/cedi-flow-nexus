@@ -158,7 +158,7 @@ export const MasterCatalogManagement: React.FC = () => {
         // Crear nuevo artículo
         const { error } = await supabase
           .from('master_articles')
-          .insert([data]);
+          .insert(data);
 
         if (error) throw error;
 
@@ -200,7 +200,7 @@ export const MasterCatalogManagement: React.FC = () => {
         // Crear nuevo paquete
         const { error } = await supabase
           .from('master_packages')
-          .insert([data]);
+          .insert(data);
 
         if (error) throw error;
 

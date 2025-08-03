@@ -18,7 +18,7 @@ const cedisSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   location: z.string().min(3, 'La ubicación debe tener al menos 3 caracteres'),
   is_active: z.boolean().default(true),
-}) satisfies z.ZodType<{name: string; location: string; is_active: boolean}>;
+});
 
 type CedisFormData = z.infer<typeof cedisSchema>;
 
@@ -88,7 +88,7 @@ export const CedisManagement: React.FC = () => {
         // Crear nuevo CEDI
         const { error } = await supabase
           .from('cedis')
-          .insert([data]);
+          .insert(data);
 
         if (error) throw error;
 
